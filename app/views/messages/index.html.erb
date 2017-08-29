@@ -1,0 +1,39 @@
+<% if current_user %>
+	<a href="/users<%= current_user.id %>">Home</a>
+	<a href="/logout" data-method="delete">Log Out</a>
+<% else %>
+	<a href="/">Home</a>
+	<a href="/register">Register</a>
+	<a href="/login">Log In</a>
+<% end %>
+
+<h3>Post a Message</h3>
+<form action="/messages" method="post">
+	<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>"/>
+	<textarea name="message[content]"> </textarea>
+	<input type="submit" value="Post a Message">
+</form>
+
+<!-- Display Messages -->
+<% @messages.each do |message| %>
+	<p><%= message.user.username %> - <%= message.format_time %></p>
+	<p><%= message.content %></p>
+	<p>-------------------</p>
+	
+	<!-- Display comments -->
+	<% unless message.comments.empty? %>
+		<h4>Comments:</h4>
+		<% message.comments.each do |comment| %>
+			<p><%= comment.user.username %> - <%= comment.format_time %></p>
+			<p><%= comment.content %></p>
+			<p>***************</p>
+		<% end %>
+	<% end %>
+
+	<!-- Add a comment -->
+	<form action="/messages/<%= message.id %>/comment" method="post">
+		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>"/>
+		<textarea name="comment[content]"> </textarea>
+	<input type="submit" value="Post a Comment">
+</form>
+<% end %>
